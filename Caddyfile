@@ -32,6 +32,16 @@
 		-Server
 	}
 
+	# The settings panel edits the live site and holds a GitHub token, so it is
+	# not for the public. The password is asked for before anything under
+	# /admin is served, so the page itself never reaches a stranger's browser.
+	# Only the bcrypt hash of the password lives here; it cannot be read back.
+	# To change the password, replace the hash with a new one from
+	# `caddy hash-password`.
+	basic_auth /admin* {
+		konnex $2b$12$gCq01n2kEQwOqBa5wGmA/OkMHC2MrqHL3ZLEjuHlvlRSxL11B9w1y
+	}
+
 	root * {{.StaticFileRoot}}
 
 	file_server {
