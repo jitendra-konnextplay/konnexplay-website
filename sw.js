@@ -67,6 +67,12 @@ self.addEventListener('fetch', function (e) {
   }
   if (url.origin !== self.location.origin) return; // third parties: not ours
 
+  /* The settings panel is password protected by the server. A navigation this
+     worker fetches on the page's behalf never reaches the browser's own login
+     prompt, so the visitor was shown a bare 401 with no way to answer it.
+     Anything under /admin is left to the browser, which knows how to ask. */
+  if (/(^|\/)admin(\/|$)/.test(url.pathname)) return;
+
   // Never cache the version file: it is how the page learns it is out of date.
   if (url.pathname.endsWith('version.json')) return;
 
