@@ -42,7 +42,7 @@
 		konnex $2b$12$gCq01n2kEQwOqBa5wGmA/OkMHC2MrqHL3ZLEjuHlvlRSxL11B9w1y
 	}
 
-	root * {{.StaticFileRoot}}
+	root * {$SITE_ROOT:/srv}
 
 	file_server {
 		hide .git
@@ -54,7 +54,7 @@
 		zstd
 	}
 
-	try_files {path} {path}.html {path}/index.html{{if .IndexFallback}} /index.html{{end}}
+	try_files {path} {path}.html {path}/index.html
 
 	handle_errors {
 		rewrite * /{err.status_code}.html

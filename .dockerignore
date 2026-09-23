@@ -1,0 +1,10 @@
+# Kept out of the served site. Everything else in the repo is the website.
+.git
+.github
+.dockerignore
+Dockerfile
+Caddyfile
+README.md
+tools-stamp-version.js
+handoff
+backend
