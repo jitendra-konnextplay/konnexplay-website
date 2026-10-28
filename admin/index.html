@@ -50,6 +50,12 @@
     border:1.5px solid var(--line); border-radius:6px; background:#fff; min-height:44px;
   }
   input[type=text]:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(13,197,154,.16)}
+  textarea, input[type=date], input[type=file]{
+    width:100%; padding:10px 12px; font:15px Inter,sans-serif; color:var(--ink);
+    border:1.5px solid var(--line); border-radius:6px; background:#fff; min-height:44px;
+  }
+  textarea{resize:vertical}
+  textarea:focus, input[type=date]:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(13,197,154,.16)}
   input.bad{border-color:var(--danger)}
   .err{color:var(--danger); font-size:12px; margin-top:4px; display:none}
   .err.show{display:block}
@@ -218,6 +224,44 @@
       </label>
     </div>
 
+
+    <div class="group">
+      <h2>Blog posts</h2>
+      <div id="kx-blog-list" style="margin:0 0 16px"></div>
+      <label>
+        <span>Title</span>
+        <input type="text" id="blogTitle" placeholder="How to reduce no-shows at a sports venue">
+      </label>
+      <label>
+        <span>URL slug</span>
+        <input type="text" id="blogSlug" placeholder="how-to-reduce-no-shows">
+        <small>Part of the post's web address. Filled in from the title; change it if you want a different one.</small>
+      </label>
+      <label>
+        <span>Excerpt</span>
+        <textarea id="blogExcerpt" rows="2" placeholder="One or two sentences shown on the blog list page."></textarea>
+      </label>
+      <label>
+        <span>Cover image</span>
+        <input type="file" id="blogImage" accept="image/*">
+        <small id="blogImageNote">Optional. Shown on the blog list and at the top of the post.</small>
+      </label>
+      <label>
+        <span>Body</span>
+        <textarea id="blogBody" rows="8" placeholder="Write the post here. Leave a blank line between paragraphs."></textarea>
+        <small>Plain text only, one paragraph per blank line. No bold, links or images inside the body yet.</small>
+      </label>
+      <label>
+        <span>Date</span>
+        <input type="date" id="blogDate">
+      </label>
+      <em class="err" id="err-blog"></em>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <button class="ghost" id="blogStage" type="button">Add to publish queue</button>
+        <button class="ghost" id="blogClearForm" type="button">Clear form</button>
+      </div>
+      <p style="margin:10px 0 0;font-size:13px;color:var(--ink-2)">Queued posts publish together with everything else when you press Save and publish below.</p>
+    </div>
 
     <div class="group">
       <h2>Zoho CRM</h2>
@@ -966,6 +1010,7 @@
 </script>
 
 <script src="edit.js"></script>
+<script src="blog.js"></script>
 <script>
 (function () {
   'use strict';
@@ -976,6 +1021,11 @@
   KX_EDIT.init({
     api: function (p, o) { return KX_PANEL.api(p, o); },
     onChange: function () { renderEdits(); try { refreshSaveButton(); } catch (e) {} }
+  });
+
+  KX_BLOG.init({
+    api: function (p, o) { return KX_PANEL.api(p, o); },
+    onChange: function () { renderBlogList(); try { refreshSaveButton(); } catch (e) {} }
   });
 
   function renderEdits() {
@@ -1004,6 +1054,136 @@
   }
   function short(t) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > 48 ? t.slice(0, 48) + '\u2026' : t; }
 
+  /* ---------- blog posts ---------- */
+
+  var blogSlugTouched = false;
+  var blogEditingSlug = null; // null while adding a new post
+
+  function mkLinkBtn(text, color, fn) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = text;
+    b.style.cssText = 'border:0;background:none;color:' + color + ';cursor:pointer;font-size:12px;text-decoration:underline;padding:0';
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  function renderBlogList() {
+    var box = $('kx-blog-list');
+    if (!box) return;
+    var staged = KX_BLOG.list();
+    var stagedBySlug = {};
+    staged.forEach(function (c) { stagedBySlug[c.slug] = c; });
+    var rows = KX_BLOG.previewList().slice().sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+    var deletions = staged.filter(function (c) { return c.kind === 'delete'; });
+
+    box.innerHTML = '';
+    if (!rows.length && !deletions.length) {
+      box.innerHTML = '<p style="font-size:13px;color:var(--muted);margin:0 0 14px">No posts yet.</p>';
+      return;
+    }
+    rows.forEach(function (p) {
+      var c = stagedBySlug[p.slug];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px';
+      var label = document.createElement('span');
+      label.textContent = p.title + (p.date ? ' \u00b7 ' + p.date : '') + (c ? '  (queued)' : '');
+      row.appendChild(label);
+      var btns = document.createElement('span');
+      btns.style.cssText = 'display:flex;gap:10px';
+      btns.appendChild(mkLinkBtn('edit', 'var(--ink-2)', function () { loadPostIntoForm(p); }));
+      if (c) btns.appendChild(mkLinkBtn('undo', 'var(--danger)', function () { KX_BLOG.undoOne(staged.indexOf(c)); }));
+      else btns.appendChild(mkLinkBtn('delete', 'var(--danger)', function () { KX_BLOG.stageDelete(p.slug); }));
+      row.appendChild(btns);
+      box.appendChild(row);
+    });
+    deletions.forEach(function (c) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px';
+      var label = document.createElement('span');
+      label.style.cssText = 'text-decoration:line-through;color:var(--muted)';
+      label.textContent = c.slug + ' \u2014 queued for removal';
+      row.appendChild(label);
+      row.appendChild(mkLinkBtn('undo', 'var(--danger)', function () { KX_BLOG.undoOne(staged.indexOf(c)); }));
+      box.appendChild(row);
+    });
+  }
+
+  function resetBlogForm() {
+    $('blogTitle').value = '';
+    $('blogSlug').value = '';
+    $('blogExcerpt').value = '';
+    $('blogImage').value = '';
+    $('blogBody').value = '';
+    $('blogDate').value = new Date().toISOString().slice(0, 10);
+    blogSlugTouched = false;
+    blogEditingSlug = null;
+    var err = $('err-blog'); if (err) { err.textContent = ''; err.className = 'err'; }
+    var note = $('blogImageNote'); if (note) note.textContent = 'Optional. Shown on the blog list and at the top of the post.';
+  }
+
+  function loadPostIntoForm(p) {
+    $('blogTitle').value = p.title || '';
+    $('blogSlug').value = p.slug || '';
+    $('blogExcerpt').value = p.excerpt || '';
+    $('blogBody').value = (p.paragraphs || []).join('\n\n');
+    $('blogDate').value = p.date || '';
+    $('blogImage').value = '';
+    blogSlugTouched = true;
+    blogEditingSlug = p.slug;
+    var note = $('blogImageNote');
+    if (note) note.textContent = p.image ? ('Current picture: ' + p.image + '. Choose a file to replace it.') : 'Optional. Shown on the blog list and at the top of the post.';
+    $('blogTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  $('blogTitle').addEventListener('input', function () {
+    if (!blogSlugTouched) $('blogSlug').value = KX_BLOG.slugify(this.value);
+  });
+  $('blogSlug').addEventListener('input', function () { blogSlugTouched = true; });
+
+  $('blogStage').addEventListener('click', function () {
+    var err = $('err-blog');
+    function fail(m) { if (err) { err.textContent = m; err.className = 'err show'; } }
+    if (err) { err.textContent = ''; err.className = 'err'; }
+
+    var title = $('blogTitle').value.trim();
+    var slug = KX_BLOG.slugify($('blogSlug').value || title);
+    var excerpt = $('blogExcerpt').value.trim();
+    var paragraphs = $('blogBody').value.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+    var date = ($('blogDate').value || '').trim() || new Date().toISOString().slice(0, 10);
+
+    if (!title) return fail('Give the post a title.');
+    if (!slug) return fail('Give the post a URL slug.');
+    if (!excerpt) return fail('Write a short excerpt for the blog list page.');
+    if (!paragraphs.length) return fail('Write the post body.');
+
+    var combined = KX_BLOG.previewList();
+    for (var i = 0; i < combined.length; i++) {
+      if (combined[i].slug === slug && slug !== blogEditingSlug) return fail('That web address is already used by another post. Choose a different slug.');
+    }
+    var prior = null;
+    for (var j = 0; j < combined.length; j++) {
+      if (combined[j].slug === (blogEditingSlug || slug)) { prior = combined[j]; break; }
+    }
+
+    var post = {
+      slug: slug, title: title, excerpt: excerpt, date: date,
+      image: (prior && prior.image) || '', imageAlt: title,
+      paragraphs: paragraphs
+    };
+    var imageFile = ($('blogImage').files && $('blogImage').files[0]) || null;
+
+    if (blogEditingSlug && blogEditingSlug !== slug) KX_BLOG.stageDelete(blogEditingSlug);
+    KX_BLOG.stagePost(post, imageFile);
+    resetBlogForm();
+    msg('info', 'Added to the publish queue. Press Save and publish to make it live.');
+  });
+
+  $('blogClearForm').addEventListener('click', resetBlogForm);
+
+  resetBlogForm();
+  KX_BLOG.loadExisting().then(renderBlogList);
+
   $('kx-edit-toggle').addEventListener('click', function () {
     if (KX_EDIT.isOn()) {
       KX_EDIT.off();
@@ -1029,10 +1209,10 @@
 
   /* Three hooks the panel asks for. Nothing of the panel is replaced. */
 
-  window.KX_EXTRA_COUNT = function () { return KX_EDIT.list().length; };
+  window.KX_EXTRA_COUNT = function () { return KX_EDIT.list().length + KX_BLOG.list().length; };
 
   window.KX_EXTRA_ROWS = function () {
-    return KX_EDIT.list().map(function (c) {
+    var edits = KX_EDIT.list().map(function (c) {
       var page = String(c.file).replace('.dc.html', '');
       return {
         label: c.kind === 'text' ? 'Text on ' + page + (c.count > 1 ? ' (' + c.count + ' places)' : '')
@@ -1043,13 +1223,28 @@
         secret: false
       };
     });
+    var posts = KX_BLOG.list().map(function (c) {
+      return {
+        label: c.kind === 'delete' ? 'Blog post removed' : 'Blog post',
+        was: c.kind === 'delete' ? c.slug : '',
+        now: c.kind === 'delete' ? '(removed)' : c.post.title,
+        secret: false
+      };
+    });
+    return edits.concat(posts);
   };
 
   window.KX_EXTRA_PUBLISH = function (progress) {
-    return KX_EDIT.publish(progress).then(function (res) {
+    return KX_EDIT.publish(progress).then(function (editRes) {
       KX_EDIT.clear();
       renderEdits();
-      return res;
+      return KX_BLOG.publish(progress).then(function (blogRes) {
+        KX_BLOG.clear();
+        renderBlogList();
+        return {
+          skipped: (editRes && editRes.skipped || []).concat(blogRes && blogRes.skipped || [])
+        };
+      });
     });
   };
 

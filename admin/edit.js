@@ -44,7 +44,7 @@
     contact: 'Contact.dc.html',
     about: 'About.dc.html',
     resources: 'Blog.dc.html',
-    blog: 'Blog.dc.html',
+    blog: 'Blog Posts.dc.html',
     research: 'Research.dc.html',
     india: 'India.dc.html',
     'channel-manager': 'Channel manager.dc.html',

@@ -153,6 +153,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}"><dc-import name="Contact" hint-size="100%,100vh"></dc-import></sc-if>
 <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}"><dc-import name="About" hint-size="100%,100vh"></dc-import></sc-if>
 <sc-if value="{{ isResources }}" hint-placeholder-val="{{ false }}"><dc-import name="Blog" hint-size="100%,100vh"></dc-import></sc-if>
+<sc-if value="{{ isBlog }}" hint-placeholder-val="{{ false }}"><dc-import name="Blog Posts" slug="{{ blogSlug }}" hint-size="100%,100vh"></dc-import></sc-if>
 <sc-if value="{{ isResearch }}" hint-placeholder-val="{{ false }}"><dc-import name="Research" hint-size="100%,100vh"></dc-import></sc-if>
 <sc-if value="{{ isIndia }}" hint-placeholder-val="{{ false }}"><dc-import name="India" hint-size="100%,100vh"></dc-import></sc-if>
 <sc-if value="{{ isChannel }}" hint-placeholder-val="{{ false }}"><dc-import name="Channel manager" hint-size="100%,100vh"></dc-import></sc-if>
@@ -238,7 +239,6 @@ class Component extends DCLogic {
       about: ['About Us', 'Built in Surat by people who ran a box cricket community and lost too many games to a phone nobody answered.', 'about'],
       contact: ['Contact Us', 'Phone and WhatsApp on +91 77788 58901, 9 AM to 11 PM, all days. Or email hello@konnexplay.com.', 'contact'],
       resources: ['Resources for Sports Venue Owners', 'Practical guides on automating venue bookings, filling empty slots, collecting advances, reducing no-shows and increasing repeat bookings.', 'resources'],
-      blog: ['Resources for Sports Venue Owners', 'Practical guides on automating venue bookings, filling empty slots, collecting advances, reducing no-shows and increasing repeat bookings.', 'resources'],
       research: ['The 2026 Sports Venue Booking Report', 'Original research on how sports venues in Surat take bookings today, with methodology, findings and limitations stated in full.', 'research/surat-venue-report-2026'],
       'channel-manager': ['Channel Manager (In Development)', 'One booking updates everywhere. The KonnexPlay channel manager is in development; direct bookings through your own booking website work today.', 'channel-manager'],
       india: ['Sports Venue Management Software for India', 'Booking software for sports venues across India: live availability, online payments, one calendar per venue and no commission on your own bookings.', 'sports-venue-management-software-india'],
@@ -253,6 +253,10 @@ class Component extends DCLogic {
       t = this.title(arg || 'box-cricket') + ' Booking Software';
       d = sportName + ' venues: let players see live slots, book and pay online, and get confirmed automatically, with one calendar and no commission on your own bookings.';
       p = (arg || 'box-cricket') + '-booking-software';
+    } else if (route === 'blog') {
+      t = 'Blog';
+      d = 'Notes for people who run sports venues: bookings, pricing, operations and growth.';
+      p = arg ? 'blog/' + arg : 'blog';
     } else {
       const m = map[route] || map.home;
       t = m[0]; d = m[1]; p = m[2];
@@ -292,11 +296,12 @@ class Component extends DCLogic {
       headerSpace: route === 'home' ? '0px' : '77px',
       isHome: route === 'home', isPlatform: route === 'platform', isPricing: route === 'pricing',
       isFaq: route === 'faq', isContact: route === 'contact', isAbout: route === 'about',
-      isResources: route === 'resources' || route === 'blog', isResearch: route === 'research', isIndia: route === 'india',
+      isResources: route === 'resources', isResearch: route === 'research', isIndia: route === 'india',
       isChannel: route === 'channel-manager', isDemo: route === 'demo', isLegal: route === 'legal',
-      isCity: route === 'city', isSport: route === 'sport',
+      isCity: route === 'city', isSport: route === 'sport', isBlog: route === 'blog',
       cityName: cityName,
-      sportName: sportName
+      sportName: sportName,
+      blogSlug: this.state.arg || ''
     };
   }
 }

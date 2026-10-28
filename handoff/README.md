@@ -101,14 +101,15 @@ The prototype is one file (`KonnexPlay.dc.html`) with a hash router, purely for 
 | Prototype route | Production path | Source file |
 | --- | --- | --- |
 | `#/home` | `/` | `Home.dc.html` |
-| `#/blog` → alias of `#/resources` | — | — |
 | `#/platform` | `/platform` | `Platform.dc.html` |
 | `#/pricing` | `/pricing` | `Pricing.dc.html` |
 | `#/demo` | `/book-a-demo` | `Book a demo.dc.html` |
 | `#/faq` | `/faq` | `FAQ.dc.html` |
 | `#/about` | `/about` | `About.dc.html` |
 | `#/contact` | `/contact` | `Contact.dc.html` |
-| `#/blog` | `/resources` | `Blog.dc.html` |
+| `#/resources` | `/resources` | `Blog.dc.html` |
+| `#/blog` | `/blog` | `Blog Posts.dc.html` |
+| `#/blog/<slug>` | `/blog/<slug>` | `Blog Posts.dc.html` (templated, posts from `blog-posts.json`) |
 | `#/research` | `/research/surat-venue-report-2026` | `Research.dc.html` |
 | `#/channel-manager` | `/channel-manager` | `Channel manager.dc.html` |
 | `#/legal?a=privacy\|terms\|refunds` | `/privacy`, `/terms`, `/refunds` (three pages) | `Legal.dc.html` |

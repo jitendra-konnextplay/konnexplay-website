@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/konnexplay-mark.svg" type="image/svg+xml">
+<link rel="icon" href="assets/konnexplay-mark-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="assets/konnexplay-mark-1024.png">
+<meta name="theme-color" content="#0D1B3E">
+<link rel="manifest" href="site.webmanifest">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta property="og:type" content="website" />
+<meta property="og:image" content="assets/venue-pickleball-1.jpg" />
+<title>Blog | KonnexPlay</title>
+<meta name="description" content="Notes for people who run sports venues: bookings, pricing, operations and growth." />
+<link rel="canonical" href="https://konnexplay.com/blog" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Outfit:wght@600..800&display=swap" rel="stylesheet" />
+<style>
+html, body { margin: 0; padding: 0; background: #FAFAF9; }
+a { color: #0D1B3E; } a:hover { color: #088064; }
+</style>
+</helmet>
+<div style="background:#FAFAF9;font-family:Inter,sans-serif;color:#0D1B3E;-webkit-font-smoothing:antialiased">
+
+<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275">
+<a href="#/home" style="color:#5A6275">Home</a> /
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}"><a href="#/blog" style="color:#5A6275">Blog</a> / {{ postTitle }}</sc-if>
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">Blog</sc-if>
+<sc-if value="{{ notFound }}" hint-placeholder-val="{{ false }}"><a href="#/blog" style="color:#5A6275">Blog</a></sc-if>
+</section>
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+<section style="max-width:1200px;margin:0 auto;padding:40px 24px 48px">
+<div style="font-size:12px;letter-spacing:0.14em;font-weight:700;color:#5A6275;margin-bottom:22px">BLOG</div>
+<h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(40px,5.4vw,76px);line-height:0.96;letter-spacing:-0.04em;margin:0 0 20px;max-width:20ch;text-wrap:balance">Notes for people who run sports venues.</h1>
+<p style="font-size:18px;line-height:1.65;color:#3D4457;margin:0;max-width:60ch;text-wrap:pretty">Short, practical posts on bookings, pricing and running a venue day to day.</p>
+</section>
+
+<sc-if value="{{ hasPosts }}" hint-placeholder-val="{{ true }}">
+<section style="max-width:1200px;margin:0 auto;padding:0 24px 96px">
+<div style="display:grid;grid-template-columns:{{ cols }};gap:48px 40px">
+<sc-for list="{{ posts }}" as="post" hint-placeholder-count="6">
+<a href="#/blog/{{ post.slug }}" style="text-decoration:none;color:#0D1B3E;display:block">
+<img loading="lazy" decoding="async" src="{{ post.image }}" alt="{{ post.imageAlt }}" style="display:block;width:100%;aspect-ratio:3/2;object-fit:cover;object-position:center;margin-bottom:18px" />
+<div style="font-size:13px;color:#5A6275;margin-bottom:8px">{{ post.dateLabel }}</div>
+<h2 style="font-family:Outfit,sans-serif;font-weight:700;font-size:22px;line-height:1.2;letter-spacing:-0.02em;margin:0 0 10px;text-wrap:balance">{{ post.title }}</h2>
+<p style="font-size:15px;line-height:1.6;color:#3D4457;margin:0 0 10px;text-wrap:pretty">{{ post.excerpt }}</p>
+<span style="font-weight:600;color:#088064;font-size:14px">Read more</span>
+</a>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ isListEmpty }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:1200px;margin:0 auto;padding:0 24px 96px">
+<div style="border-top:1px solid #DDE0E5;padding:40px 0;color:#5A6275;font-size:16px">No posts yet. Check back soon.</div>
+</section>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<img loading="lazy" decoding="async" src="{{ post.image }}" alt="{{ post.imageAlt }}" style="display:block;width:100%;height:clamp(220px,34vw,440px);object-fit:cover;object-position:center" />
+<article style="max-width:800px;margin:0 auto;padding:40px 24px 96px">
+<div style="font-size:13px;color:#5A6275;margin-bottom:18px">{{ post.dateLabel }}</div>
+<h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,56px);line-height:1.02;letter-spacing:-0.035em;margin:0 0 36px;text-wrap:balance">{{ post.title }}</h1>
+<div style="font-size:18px;line-height:1.75;color:#3D4457;text-wrap:pretty">
+<sc-for list="{{ post.paragraphs }}" as="para" hint-placeholder-count="4">
+<p style="margin:0 0 22px">{{ para }}</p>
+</sc-for>
+</div>
+<a href="#/blog" style="display:inline-block;margin-top:16px;font-weight:600;color:#088064;text-decoration:none">&larr; Back to Blog</a>
+</article>
+</sc-if>
+
+<sc-if value="{{ notFound }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:1200px;margin:0 auto;padding:40px 24px 96px">
+<h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(30px,3.6vw,48px);line-height:1;letter-spacing:-0.03em;margin:0 0 16px">We could not find that post.</h1>
+<a href="#/blog" style="font-weight:600;color:#088064;text-decoration:none">&larr; Back to Blog</a>
+</section>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;slug&quot;:{&quot;tsType&quot;:&quot;string&quot;,&quot;default&quot;:&quot;&quot;}}">
+class Component extends DCLogic {
+  state = { w: 1200, posts: [], loaded: false };
+  componentDidMount() {
+    this._r = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this._r);
+    this._r();
+    fetch('blog-posts.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : [])
+      .then(posts => this.setState({ posts: Array.isArray(posts) ? posts : [], loaded: true }))
+      .catch(() => this.setState({ posts: [], loaded: true }));
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  formatDate(d) {
+    try {
+      var parts = String(d || '').split('-').map(Number);
+      var dt = new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+      return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) { return d || ''; }
+  }
+
+  /* One post, once its slug matches: real per-post SEO, overriding the
+     router's generic blog title once this component knows which post it is. */
+  seo(post) {
+    try {
+      const B = ' | KonnexPlay';
+      const t = post.title + B;
+      document.title = t;
+      const set = (sel, attr, val) => {
+        let el = document.head.querySelector(sel);
+        if (!el) {
+          el = document.createElement(sel.indexOf('link') === 0 ? 'link' : 'meta');
+          if (sel.indexOf('link') === 0) el.setAttribute('rel', 'canonical');
+          else el.setAttribute(sel.indexOf('property') > -1 ? 'property' : 'name', sel.replace(/.*=["']|["'].*/g, ''));
+          document.head.appendChild(el);
+        }
+        el.setAttribute(attr, val);
+      };
+      set('meta[name="description"]', 'content', post.excerpt || '');
+      set('link[rel="canonical"]', 'href', 'https://konnexplay.com/blog/' + post.slug);
+      set('meta[property="og:title"]', 'content', t);
+      set('meta[property="og:description"]', 'content', post.excerpt || '');
+      set('meta[property="og:url"]', 'content', 'https://konnexplay.com/blog/' + post.slug);
+    } catch (e) {}
+  }
+
+  renderVals() {
+    const w = this.state.w;
+    const loaded = this.state.loaded;
+    const slug = this.props.slug || '';
+    const raw = (this.state.posts || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    const withLabel = raw.map(p => Object.assign({}, p, {
+      image: p.image || 'assets/venue-pickleball-1.jpg',
+      dateLabel: this.formatDate(p.date)
+    }));
+    const match = slug ? withLabel.find(p => p.slug === slug) : null;
+    const isDetail = loaded && !!match;
+    const notFound = loaded && !!slug && !match;
+    const isList = loaded && !slug;
+    if (isDetail) this.seo(match);
+    return {
+      isList: isList,
+      hasPosts: withLabel.length > 0,
+      isListEmpty: isList && withLabel.length === 0,
+      posts: withLabel,
+      isDetail: isDetail,
+      notFound: notFound,
+      post: match,
+      postTitle: match ? match.title : '',
+      cols: w < 700 ? '1fr' : (w < 1000 ? '1fr 1fr' : '1fr 1fr 1fr')
+    };
+  }
+}
+</script>
+</body>
+</html>
