@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<!-- Visiting /admin with no trailing slash still serves this file (Caddy's
+     try_files falls through to admin/index.html without redirecting), but the
+     address bar then stays at /admin. Every relative URL below (edit.js, the
+     preview iframe, the content.json fallback) would resolve against site
+     root instead of /admin/ without this. -->
+<base href="/admin/">
 <title>KonnexPlay site settings</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Outfit:wght@600..800&display=swap" rel="stylesheet">
 <style>
