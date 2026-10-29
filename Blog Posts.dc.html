@@ -61,11 +61,7 @@ a { color: #0D1B3E; } a:hover { color: #088064; }
 <article style="max-width:800px;margin:0 auto;padding:40px 24px 96px">
 <div style="font-size:13px;color:#5A6275;margin-bottom:18px">{{ post.dateLabel }}</div>
 <h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,56px);line-height:1.02;letter-spacing:-0.035em;margin:0 0 36px;text-wrap:balance">{{ post.title }}</h1>
-<div style="font-size:18px;line-height:1.75;color:#3D4457;text-wrap:pretty">
-<sc-for list="{{ post.paragraphs }}" as="para" hint-placeholder-count="4">
-<p style="margin:0 0 22px">{{ para }}</p>
-</sc-for>
-</div>
+<div id="kx-blog-body" style="font-size:18px;line-height:1.75;color:#3D4457;text-wrap:pretty"></div>
 <a href="#/blog" style="display:inline-block;margin-top:16px;font-weight:600;color:#088064;text-decoration:none">&larr; Back to Blog</a>
 </article>
 </sc-if>
@@ -80,6 +76,57 @@ a { color: #0D1B3E; } a:hover { color: #088064; }
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;slug&quot;:{&quot;tsType&quot;:&quot;string&quot;,&quot;default&quot;:&quot;&quot;}}">
+/* The page template only ever renders {{ para }} as escaped text, so a post
+   written with real markup (<p>, <strong>, <a>...) would otherwise show up
+   as literal tags. There is no raw-HTML interpolation in the template
+   syntax, so the body is instead written straight into the DOM below,
+   through a safe-list sanitizer first since posts are visitor-facing and
+   the page's CSP allows inline scripts. */
+var KX_BODY_ALLOWED_TAGS = { P: 1, BR: 1, STRONG: 1, B: 1, EM: 1, I: 1, U: 1, A: 1, UL: 1, OL: 1, LI: 1, H2: 1, H3: 1, H4: 1, BLOCKQUOTE: 1, CODE: 1, PRE: 1, IMG: 1, SPAN: 1 };
+var KX_BODY_DROP_TAGS = { SCRIPT: 1, STYLE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, LINK: 1, META: 1, BASE: 1, FORM: 1, INPUT: 1, BUTTON: 1, SVG: 1, NOSCRIPT: 1 };
+
+function kxBodySafeUrl(u) {
+  u = String(u || '').trim();
+  if (!u) return '';
+  if (/^(https?:|mailto:|tel:|#|\/|\.\.?\/)/i.test(u)) return u;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(u)) return ''; // any other scheme, e.g. javascript:, data:
+  return u; // plain relative path
+}
+
+function kxBodySanitizeInto(doc, src, dest) {
+  for (var i = 0; i < src.childNodes.length; i++) {
+    var n = src.childNodes[i];
+    if (n.nodeType === 3) { dest.appendChild(doc.createTextNode(n.nodeValue)); continue; }
+    if (n.nodeType !== 1) continue;
+    var tag = n.tagName;
+    if (KX_BODY_DROP_TAGS[tag]) continue;
+    if (!KX_BODY_ALLOWED_TAGS[tag]) { kxBodySanitizeInto(doc, n, dest); continue; } // unwrap unknown tags, keep their content
+    var el = doc.createElement(tag);
+    if (tag === 'A') {
+      var href = kxBodySafeUrl(n.getAttribute('href'));
+      if (href) { el.setAttribute('href', href); el.setAttribute('rel', 'noopener'); }
+    } else if (tag === 'IMG') {
+      var src2 = kxBodySafeUrl(n.getAttribute('src'));
+      if (src2) el.setAttribute('src', src2);
+      var alt = n.getAttribute('alt');
+      if (alt) el.setAttribute('alt', alt);
+      el.setAttribute('loading', 'lazy');
+    }
+    kxBodySanitizeInto(doc, n, el);
+    dest.appendChild(el);
+  }
+}
+
+function kxBodySanitizeHtml(html) {
+  // A document created this way is never attached to the page, so nothing
+  // in it (images, anything else) loads or runs while it's being read.
+  var doc = document.implementation.createHTMLDocument('');
+  doc.body.innerHTML = String(html || '');
+  var out = doc.createElement('div');
+  kxBodySanitizeInto(doc, doc.body, out);
+  return out.innerHTML;
+}
+
 class Component extends DCLogic {
   state = { w: 1200, posts: [], loaded: false };
   componentDidMount() {
@@ -90,8 +137,29 @@ class Component extends DCLogic {
       .then(r => r.ok ? r.json() : [])
       .then(posts => this.setState({ posts: Array.isArray(posts) ? posts : [], loaded: true }))
       .catch(() => this.setState({ posts: [], loaded: true }));
+    this.injectBody();
   }
+  componentDidUpdate() { this.injectBody(); }
   componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  /* Paragraphs that already start with a tag (typed as real HTML in the
+     admin panel) are used as-is; plain text paragraphs keep the old
+     auto-wrap so existing posts look the same as before. */
+  injectBody() {
+    var el = document.getElementById('kx-blog-body');
+    if (!el) { this._injectedSlug = null; return; }
+    var match = this._match;
+    var slug = match ? match.slug : null;
+    if (slug === this._injectedSlug) return;
+    this._injectedSlug = slug;
+    if (!match) { el.innerHTML = ''; return; }
+    var html = (match.paragraphs || []).map(function (p) {
+      var t = String(p == null ? '' : p).trim();
+      if (!t) return '';
+      return /^</.test(t) ? t : '<p style="margin:0 0 22px">' + t + '</p>';
+    }).join('');
+    el.innerHTML = kxBodySanitizeHtml(html);
+  }
 
   formatDate(d) {
     try {
@@ -139,6 +207,7 @@ class Component extends DCLogic {
     const isDetail = loaded && !!match;
     const notFound = loaded && !!slug && !match;
     const isList = loaded && !slug;
+    this._match = isDetail ? match : null;
     if (isDetail) this.seo(match);
     return {
       isList: isList,
