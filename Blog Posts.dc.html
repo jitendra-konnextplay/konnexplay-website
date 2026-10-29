@@ -64,7 +64,7 @@ a { color: #0D1B3E; } a:hover { color: #088064; }
 </sc-if>
 
 <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
-<img loading="lazy" decoding="async" src="{{ post.image }}" alt="{{ post.imageAlt }}" style="display:block;width:100%;height:clamp(220px,34vw,440px);object-fit:cover;object-position:center" />
+<img loading="lazy" decoding="async" src="{{ post.image }}" alt="{{ post.imageAlt }}" style="display:block;width:100%;height:clamp(220px,34vw,440px);object-fit:cover;object-position:center top" />
 <article style="max-width:800px;margin:0 auto;padding:40px 24px 96px">
 <div style="font-size:13px;color:#5A6275;margin-bottom:18px">{{ post.dateLabel }}</div>
 <h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,56px);line-height:1.02;letter-spacing:-0.035em;margin:0 0 36px;text-wrap:balance">{{ post.title }}</h1>
