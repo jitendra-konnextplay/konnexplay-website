@@ -26,13 +26,6 @@ a { color: #0D1B3E; } a:hover { color: #088064; }
 </helmet>
 <div style="background:#FAFAF9;font-family:Inter,sans-serif;color:#0D1B3E;-webkit-font-smoothing:antialiased">
 
-<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275">
-<a href="#/home" style="color:#5A6275">Home</a> /
-<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}"><a href="#/blog" style="color:#5A6275">Blog</a> / {{ postTitle }}</sc-if>
-<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">Blog</sc-if>
-<sc-if value="{{ notFound }}" hint-placeholder-val="{{ false }}"><a href="#/blog" style="color:#5A6275">Blog</a></sc-if>
-</section>
-
 <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
 <section style="max-width:1200px;margin:0 auto;padding:40px 24px 48px">
 <div style="font-size:12px;letter-spacing:0.14em;font-weight:700;color:#5A6275;margin-bottom:22px">BLOG</div>
