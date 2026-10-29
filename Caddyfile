@@ -32,6 +32,13 @@
 		-Server
 	}
 
+	# These page files are edited from the admin panel and need to show up the
+	# moment they're published, not whenever a browser's heuristic cache
+	# decides to revalidate. Forcing a revalidation on every load keeps it
+	# cheap (a 304 when nothing changed) while making edits appear immediately.
+	@editablePages path *.dc.html /index.html
+	header @editablePages Cache-Control "no-cache"
+
 	# The settings panel edits the live site and holds a GitHub token, so it is
 	# not for the public. The password is asked for before anything under
 	# /admin is served, so the page itself never reaches a stranger's browser.
