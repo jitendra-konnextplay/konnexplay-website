@@ -23,14 +23,14 @@ a:focus-visible { outline: 3px solid #0DC59A; outline-offset: 2px; }
 </style>
 </helmet>
 <div style="background:#FAFAF9;font-family:Inter,sans-serif;color:#0D1B3E;-webkit-font-smoothing:antialiased">
-<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275"><a href="#/home" style="color:#5A6275">Home</a> / <a href="#/india" style="color:#5A6275">India</a> / {{ city }}</section>
+<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275"><a href="/home" style="color:#5A6275">Home</a> / <a href="/india" style="color:#5A6275">India</a> / {{ city }}</section>
 
 <section style="max-width:1200px;margin:0 auto;padding:40px 24px 72px;display:grid;grid-template-columns:{{ cols75 }};gap:48px 80px;align-items:end">
 <div>
 <div style="font-size:12px;letter-spacing:0.14em;font-weight:700;color:#088064;margin-bottom:22px">SPORTS VENUE BOOKING SOFTWARE · {{ cityUpper }}</div>
 <h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(40px,5.4vw,76px);line-height:0.96;letter-spacing:-0.04em;margin:0 0 24px;text-wrap:balance">Sports venue booking software in {{ city }}.</h1>
 <p style="font-size:18px;line-height:1.65;color:#3D4457;margin:0 0 32px;max-width:52ch;text-wrap:pretty">{{ intro }}</p>
-<a href="#/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a 20-minute demo</a>
+<a href="/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a 20-minute demo</a>
 </div>
 <dc-import name="BookingAnim" scene="slot" speed="{{ 1700 }}" hint-size="100%,300px" style="width:100%;max-width:420px;justify-self:end"></dc-import>
 </section>
@@ -47,7 +47,7 @@ a:focus-visible { outline: 3px solid #0DC59A; outline-offset: 2px; }
 <div style="border-top:1px solid #DDE0E5;padding:14px 0;font-size:17px;display:flex;justify-content:space-between;gap:16px"><span>Setup</span><span style="font-weight:600">In person, at your venue</span></div>
 <div style="border-top:1px solid #DDE0E5;padding:14px 0;font-size:17px;display:flex;justify-content:space-between;gap:16px"><span>Price</span><span style="font-weight:600">From ₹12,000 per court per year</span></div>
 <div style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:14px 0;font-size:17px;display:flex;justify-content:space-between;gap:16px"><span>Commission on direct bookings</span><span style="font-weight:600;color:#088064">None</span></div>
-<sc-if value="{{ isSurat }}" hint-placeholder-val="{{ false }}"><p style="font-size:15px;line-height:1.7;color:#5A6275;margin:24px 0 0">KonnexPlay was founded in Surat in 2026. <a href="#/research">Read our July 2026 study of 171 sports venues in Surat.</a></p></sc-if>
+<sc-if value="{{ isSurat }}" hint-placeholder-val="{{ false }}"><p style="font-size:15px;line-height:1.7;color:#5A6275;margin:24px 0 0">KonnexPlay was founded in Surat in 2026. <a href="/research">Read our July 2026 study of 171 sports venues in Surat.</a></p></sc-if>
 </div>
 </section>
 
@@ -55,21 +55,21 @@ a:focus-visible { outline: 3px solid #0DC59A; outline-offset: 2px; }
 <div style="max-width:1200px;margin:0 auto;padding:72px 24px">
 <div style="font-size:12px;letter-spacing:0.14em;font-weight:700;color:#5A6275;margin-bottom:22px">SPORTS WE SERVE IN {{ cityUpper }}</div>
 <div style="display:grid;grid-template-columns:{{ cols3 }};gap:0 40px">
-<a href="#/sport/box-cricket" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Box cricket</a>
-<a href="#/sport/football-turf" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Football turf</a>
-<a href="#/sport/pickleball" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Pickleball</a>
-<a href="#/sport/padel" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Padel</a>
-<a href="#/sport/badminton" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Badminton</a>
-<a href="#/sport/tennis" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Tennis</a>
+<a href="/sport/box-cricket" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Box cricket</a>
+<a href="/sport/football-turf" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Football turf</a>
+<a href="/sport/pickleball" style="border-top:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Pickleball</a>
+<a href="/sport/padel" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Padel</a>
+<a href="/sport/badminton" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Badminton</a>
+<a href="/sport/tennis" style="border-top:1px solid #DDE0E5;border-bottom:1px solid #DDE0E5;padding:18px 0;text-decoration:none;font-family:Outfit,sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em">Tennis</a>
 </div>
-<div style="margin-top:28px;display:flex;gap:16px 28px;flex-wrap:wrap;font-size:15px"><a href="#/platform">Platform</a><a href="#/pricing">Pricing</a><a href="#/city/surat">Surat</a><a href="#/city/vadodara">Vadodara</a><a href="#/city/bharuch">Bharuch</a><a href="#/city/valsad">Valsad</a><a href="#/city/bangalore">Bangalore</a></div>
+<div style="margin-top:28px;display:flex;gap:16px 28px;flex-wrap:wrap;font-size:15px"><a href="/platform">Platform</a><a href="/pricing">Pricing</a><a href="/city/surat">Surat</a><a href="/city/vadodara">Vadodara</a><a href="/city/bharuch">Bharuch</a><a href="/city/valsad">Valsad</a><a href="/city/bangalore">Bangalore</a></div>
 </div>
 </section>
 
 <section style="background:#0D1B3E;color:#FFFFFF">
 <div style="max-width:1200px;margin:0 auto;padding:96px 24px">
 <h2 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,64px);line-height:0.96;letter-spacing:-0.035em;margin:0 0 24px;max-width:20ch;text-wrap:balance">Run a venue in {{ city }}? Twenty minutes is all we need.</h2>
-<a href="#/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a demo</a>
+<a href="/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a demo</a>
 </div>
 </section>
 </div>

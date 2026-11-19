@@ -39,7 +39,7 @@ header a:focus-visible {
    copy of it is duplication that costs the Menu button its place. Hide it and
    the header fits with room to spare. */
 @media (max-width: 767px) {
-  header div[style*="margin-left: auto"] > a[href="#/demo"] {
+  header div[style*="margin-left: auto"] > a[href="/demo"] {
     display: none !important;
   }
 }

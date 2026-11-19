@@ -65,18 +65,18 @@
       '<a href="https://wa.me/' + digits + '?text=' +
         encodeURIComponent('Hi, I run a venue and want to know about KonnexPlay.') +
         '" target="_blank" rel="noopener" aria-label="Message KonnexPlay on WhatsApp">' + ICON.whatsapp + 'WhatsApp</a>' +
-      '<a class="kx-primary" href="#/demo" aria-label="Book a 20-minute demo">' + ICON.calendar + 'Book a demo</a>';
+      '<a class="kx-primary" href="/demo" aria-label="Book a 20-minute demo">' + ICON.calendar + 'Book a demo</a>';
 
     document.body.appendChild(bar);
 
     /* Offering "Book a demo" on the demo page is a button back to where you
        already are. Track the route and let Call and WhatsApp share the bar. */
     var markRoute = function () {
-      var onDemo = (location.hash || '').indexOf('#/demo') === 0;
+      var onDemo = location.pathname.indexOf('/demo') === 0;
       bar.classList.toggle('kx-on-demo', onDemo);
     };
     markRoute();
-    window.addEventListener('hashchange', markRoute);
+    window.addEventListener('popstate', markRoute);
 
     // Keep the number in step if the admin panel changes it.
     if (window.MutationObserver) {

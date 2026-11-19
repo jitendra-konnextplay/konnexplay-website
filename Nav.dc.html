@@ -20,7 +20,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid #0DC59A; outline-offs
 </helmet>
 <header style="position:fixed;top:0;left:0;right:0;z-index:40;border-bottom:1px solid {{ navBorder }};background:{{ navBg }};backdrop-filter:{{ navBlur }};font-family:Inter,sans-serif;transition:background 200ms ease,border-color 200ms ease">
 <div style="max-width:1200px;box-sizing:border-box;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:28px">
-<a href="#/home" aria-label="KonnexPlay home" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:{{ navInk }};flex-shrink:0">
+<a href="/home" aria-label="KonnexPlay home" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:{{ navInk }};flex-shrink:0">
 <div style="display:grid;grid-template-columns:repeat(3,8px);grid-template-rows:repeat(3,8px);gap:2px" aria-hidden="true">
 <div style="background:#0DC59A;border-radius:2.5px"></div><div style="background:#DDE0E5;border-radius:2.5px"></div><div style="background:#0DC59A;border-radius:2.5px"></div>
 <div style="background:#0DC59A;border-radius:2.5px"></div><div style="background:#0DC59A;border-radius:2.5px"></div><div style="background:#DDE0E5;border-radius:2.5px"></div>
@@ -29,30 +29,30 @@ a:focus-visible, button:focus-visible { outline: 3px solid #0DC59A; outline-offs
 <span style="font-family:Outfit,sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.02em;line-height:1;color:{{ navInk }};transition:color 200ms ease">Konnex<span style="color:#0DC59A">Play</span></span>
 </a>
 <nav aria-label="Primary" style="display:{{ navDisplay }};gap:24px;min-width:0;white-space:nowrap;align-items:center;font-size:15px;font-weight:500">
-<a href="#/platform" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Platform</a>
-<a href="#/home?a=platform" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">How it works</a>
-<a href="#/pricing" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Pricing</a>
-<a href="#/resources" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Resources</a>
-<a href="#/blog" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Blog</a>
+<a href="/platform" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Platform</a>
+<a href="/home?a=platform" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">How it works</a>
+<a href="/pricing" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Pricing</a>
+<a href="/resources" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Resources</a>
+<a href="/blog" style="color:{{ navInk }};text-decoration:none;transition:color 200ms ease">Blog</a>
 </nav>
 <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
-<a href="#/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:12px 20px;font-weight:600;font-size:15px;display:inline-block;white-space:nowrap">Book a demo</a>
+<a href="/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:12px 20px;font-weight:600;font-size:15px;display:inline-block;white-space:nowrap">Book a demo</a>
 <button type="button" aria-label="Menu" aria-expanded="{{ menuOpen }}" onClick="{{ toggleMenu }}" style="display:{{ burgerDisplay }};border:1px solid #DDE0E5;background:#FFFFFF;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px;color:#0D1B3E">{{ menuLabel }}</button>
 </div>
 </div>
 <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
 <nav aria-label="Mobile" style="border-top:1px solid #DDE0E5;background:#FFFFFF;display:flex;flex-direction:column;font-family:Outfit,sans-serif">
-<a href="#/platform" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Platform</a>
-<a href="#/home?a=platform" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">How it works</a>
-<a href="#/pricing" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Pricing</a>
-<a href="#/resources" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Resources</a>
-<a href="#/blog" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Blog</a>
-<a href="#/demo" onClick="{{ closeMenu }}" style="margin:16px 24px 20px;background:#0DC59A;color:#061428;text-decoration:none;text-align:center;padding:18px;font-weight:700;font-size:18px">Book a demo</a>
+<a href="/platform" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Platform</a>
+<a href="/home?a=platform" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">How it works</a>
+<a href="/pricing" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Pricing</a>
+<a href="/resources" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Resources</a>
+<a href="/blog" onClick="{{ closeMenu }}" style="padding:18px 24px;border-bottom:1px solid #DDE0E5;text-decoration:none;font-size:22px;font-weight:700;color:#0D1B3E;letter-spacing:-0.02em">Blog</a>
+<a href="/demo" onClick="{{ closeMenu }}" style="margin:16px 24px 20px;background:#0DC59A;color:#061428;text-decoration:none;text-align:center;padding:18px;font-weight:700;font-size:18px">Book a demo</a>
 </nav>
 </sc-if>
 <sc-if value="{{ showBar }}" hint-placeholder-val="{{ false }}">
 <div style="position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 12px;background:rgba(250,250,249,.96);border-top:1px solid #DDE0E5">
-<a href="#/demo" style="display:block;background:#0DC59A;color:#061428;text-decoration:none;text-align:center;padding:16px;font-weight:700;font-size:16px;font-family:Inter,sans-serif">Book a demo</a>
+<a href="/demo" style="display:block;background:#0DC59A;color:#061428;text-decoration:none;text-align:center;padding:16px;font-weight:700;font-size:16px;font-family:Inter,sans-serif">Book a demo</a>
 </div>
 </sc-if>
 </header>

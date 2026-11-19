@@ -1,20 +1,10 @@
 /**
- * In-page anchors on a hash-routed site.
- *
- * The site uses the address hash for routing: #/platform, #/pricing and so on.
- * The Platform page also has an old-fashioned jump list, "Venue management",
- * "Booking engine", "Channel manager", written as plain anchors like
+ * In-page anchors, e.g. the Platform page's jump list ("Venue management",
+ * "Booking engine", "Channel manager"), written as plain anchors like
  * #venue-management.
  *
- * Those two uses of the hash collide. Clicking one rewrote the hash, the router
- * saw a route it did not recognise, fell back to the homepage, and the section
- * being jumped to vanished along with the page. So the visitor pressed a link
- * on the Platform page and landed back at the top of the homepage, which reads
- * as the site being broken.
- *
- * This intercepts those links only. If a matching element exists on the page,
- * it scrolls there and leaves the route hash alone. Anything the router owns,
- * a link beginning #/, is untouched.
+ * This intercepts those links and, when a matching element exists on the
+ * page, scrolls to it with the fixed header's height accounted for.
  */
 (function () {
   'use strict';
@@ -63,8 +53,7 @@
       var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
       if (!a) return;
       var href = a.getAttribute('href') || '';
-      // Routes belong to the router. Only plain in-page anchors are ours.
-      if (href.indexOf('#/') === 0 || href === '#') return;
+      if (href === '#') return;
       var id = href.slice(1);
       if (!id) return;
       if (!document.getElementById(id)) return; // not on this page: let it be

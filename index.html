@@ -169,20 +169,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 class Component extends DCLogic {
   state = { route: 'home', arg: '' };
   parse() {
-    const raw = (window.location.hash || '#/home').replace(/^#\/?/, '');
-    const clean = raw.split('?')[0].replace(/\/$/, '');
+    const clean = (window.location.pathname || '/').replace(/^\/|\/$/g, '');
     const parts = clean.split('/').filter(Boolean);
     const route = parts[0] || 'home';
     const arg = parts[1] || '';
     this.setState({ route, arg });
-    /* The home page is the site's root, so it should read as one. Every other
-       route keeps its hash; only '#/home' with nothing after it is tidied away,
-       and never when an anchor is being jumped to. */
-    if (route === 'home' && !arg && raw.indexOf('a=') === -1 && window.location.hash) {
-      try { window.history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
-    }
     [200, 800].forEach(t => setTimeout(() => this.reveal(), t));
-    const am = raw.match(/[?&]a=([A-Za-z0-9_-]+)/);
+    const am = window.location.search.match(/[?&]a=([A-Za-z0-9_-]+)/);
     if (am) {
       const tryScroll = (n) => {
         const el = document.getElementById(am[1]);
@@ -216,14 +209,41 @@ class Component extends DCLogic {
     });
   }
 
+  /* A link belongs to this router only if it points at another page on this
+     site rather than a file: no leading "//" (protocol-relative), not under
+     /admin (that is a real server path, not a client route), and no file
+     extension on its last segment (assets, downloads, other real pages). */
+  isAppRoute(href) {
+    if (!href || href.charAt(0) !== '/' || href.charAt(1) === '/') return false;
+    if (href.indexOf('/admin') === 0) return false;
+    const p = href.split(/[?#]/)[0];
+    return !/\.[a-z0-9]{1,8}$/i.test(p);
+  }
   componentDidMount() {
-    this._h = () => this.parse();
-    window.addEventListener('hashchange', this._h);
+    this._pop = () => this.parse();
+    window.addEventListener('popstate', this._pop);
+    this._click = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a || (a.target && a.target !== '_self')) return;
+      const href = a.getAttribute('href') || '';
+      if (!this.isAppRoute(href)) return;
+      e.preventDefault();
+      if (href !== window.location.pathname + window.location.search) {
+        window.history.pushState(null, '', href);
+        window.dispatchEvent(new Event('popstate'));
+      }
+    };
+    document.addEventListener('click', this._click);
 
     this.parse();
     [120, 600, 1400].forEach(t => setTimeout(() => this.reveal(), t));
   }
-  componentWillUnmount() { window.removeEventListener('hashchange', this._h); if (this._io) this._io.disconnect(); }
+  componentWillUnmount() {
+    window.removeEventListener('popstate', this._pop);
+    document.removeEventListener('click', this._click);
+    if (this._io) this._io.disconnect();
+  }
   title(s) { return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
 
   /* one title, description and canonical per route — in production each of

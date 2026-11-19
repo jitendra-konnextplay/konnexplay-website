@@ -11,17 +11,17 @@ python3 -m http.server 8000
 # then open http://localhost:8000
 ```
 
-A plain `file://` open will NOT work — the runtime fetches page files over HTTP. Any static host works: GitHub Pages, Netlify, Vercel, S3, nginx.
+A plain `file://` open will NOT work — the runtime fetches page files over HTTP. The router now reads the real URL path (`/platform`, not `#/platform`), which needs a host that falls back unmatched paths to `index.html` — `Caddyfile` does this for the Railpack/Caddy production deploy. A host with no server-side rewrite support (plain GitHub Pages, S3, nginx without config) will only serve the homepage correctly for deep links typed or refreshed directly; Netlify and Vercel can be configured with their own rewrite rule (`_redirects` / `vercel.json`) to the same effect.
 
 ### GitHub Pages
 
-Push this folder to a repository, then Settings → Pages → Deploy from branch → `main` / `root`. The site is live at `https://<user>.github.io/<repo>/`.
+Push this folder to a repository, then Settings → Pages → Deploy from branch → `main` / `root`. The site is live at `https://<user>.github.io/<repo>/`. Without a rewrite rule, only the homepage resolves on a hard refresh or a direct link; in-app navigation still works.
 
 ## What is here
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | The site. One document with a hash router; open this. |
+| `index.html` | The site. One document with a path-based client router; open this. |
 | `*.dc.html` | Individual pages, loaded by the router at runtime |
 | `assets/` | Real venue photography, product screenshots, video |
 | `film-*.html` | Five brand films, each self-contained |
@@ -32,9 +32,11 @@ Push this folder to a repository, then Settings → Pages → Deploy from branch
 
 ## Routes
 
-`#/home` `#/platform` `#/pricing` `#/book-a-demo` (`#/demo`) `#/faq` `#/about` `#/contact` `#/resources` `#/research` `#/channel-manager` `#/legal` `#/india`
+`/` `/platform` `/pricing` `/demo` `/faq` `/about` `/contact` `/resources` `/research` `/channel-manager` `/legal` `/india`
 
-Templated: `#/sport/<box-cricket|football-turf|pickleball|padel|badminton|tennis>` and `#/city/<surat|vadodara|bharuch|valsad|bangalore>`
+Templated: `/sport/<box-cricket|football-turf|pickleball|padel|badminton|tennis>` and `/city/<surat|vadodara|bharuch|valsad|bangalore>`
+
+These are the router's internal tokens, not the SEO-friendly slugs `handoff/README.md` specs out for the production rebuild (e.g. `/book-a-demo`, `/sports-venue-software-surat`) — the canonical tags already point at those future slugs, which is why they look different from the address bar today.
 
 ## Before this goes to production
 

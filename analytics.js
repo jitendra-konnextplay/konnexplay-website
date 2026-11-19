@@ -62,11 +62,11 @@
   else if (provider === 'ga4') loadGa4();
   else return;
 
-  /* ---- page views across hash routes ---- */
+  /* ---- page views across routes ---- */
 
   var lastPath = null;
   function pageview() {
-    var path = location.hash.replace(/^#/, '') || '/home';
+    var path = location.pathname === '/' ? '/home' : location.pathname;
     if (path === lastPath) return;
     lastPath = path;
     if (provider === 'ga4') {
@@ -79,7 +79,7 @@
     // Plausible reads the URL itself via script.hash.js.
   }
   pageview();
-  window.addEventListener('hashchange', function () { setTimeout(pageview, 250); });
+  window.addEventListener('popstate', function () { setTimeout(pageview, 250); });
 
   /* ---- the events that actually mean money ---- */
 
@@ -99,7 +99,7 @@
       if (href.indexOf('tel:') === 0) track('Call clicked', { where: where });
       else if (href.indexOf('wa.me') !== -1) track('WhatsApp clicked', { where: where });
       else if (href.indexOf('mailto:') === 0) track('Email clicked', { where: where });
-      else if (href.indexOf('#/demo') !== -1 || href.indexOf('#/book-a-demo') !== -1)
+      else if (href.indexOf('/demo') !== -1 || href.indexOf('/book-a-demo') !== -1)
         track('Demo CTA clicked', { where: where, label: label(a) });
       else if (href.indexOf('.dc.html') !== -1 && /film|story/i.test(href))
         track('Film opened', { label: label(a) });
@@ -114,7 +114,7 @@
       var f = e.target;
       if (!f || f.tagName !== 'FORM') return;
       if (!f.querySelector('input')) return;
-      track('Demo request submitted', { page: location.hash || '#/home' });
+      track('Demo request submitted', { page: location.pathname === '/' ? '/home' : location.pathname });
     },
     true
   );
@@ -130,7 +130,7 @@
       var pct = (window.scrollY + h.clientHeight) / h.scrollHeight;
       if (pct >= 0.9) {
         deep = true;
-        track('Read to the end', { page: location.hash || '#/home' });
+        track('Read to the end', { page: location.pathname === '/' ? '/home' : location.pathname });
       }
     },
     { passive: true }

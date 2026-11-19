@@ -24,14 +24,14 @@ a:focus-visible { outline: 3px solid #0DC59A; outline-offset: 2px; }
 </helmet>
 <div style="background:#FAFAF9;font-family:Inter,sans-serif;color:#0D1B3E;-webkit-font-smoothing:antialiased">
 
-<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275"><a href="#/home" style="color:#5A6275">Home</a> / <a href="#/home?a=sports" style="color:#5A6275">Sports</a> / {{ d.name }}</section>
+<section style="max-width:1200px;margin:0 auto;padding:28px 24px 0;font-size:13px;color:#5A6275"><a href="/home" style="color:#5A6275">Home</a> / <a href="/home?a=sports" style="color:#5A6275">Sports</a> / {{ d.name }}</section>
 
 <section style="max-width:1200px;margin:0 auto;padding:40px 24px 72px;display:grid;grid-template-columns:{{ cols75 }};gap:48px 80px;align-items:end">
 <div>
 <div style="font-size:12px;letter-spacing:0.14em;font-weight:700;color:#088064;margin-bottom:22px">{{ d.eyebrow }}</div>
 <h1 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(40px,5.4vw,76px);line-height:0.96;letter-spacing:-0.04em;margin:0 0 24px;text-wrap:balance">{{ d.h1 }}</h1>
 <p style="font-size:18px;line-height:1.65;color:#3D4457;margin:0 0 32px;max-width:52ch;text-wrap:pretty">{{ d.intro }}</p>
-<a href="#/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a 20-minute demo</a>
+<a href="/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a 20-minute demo</a>
 </div>
 <dc-import name="BookingAnim" scene="slot" speed="{{ 1700 }}" hint-size="100%,300px" style="width:100%;max-width:420px;justify-self:end"></dc-import>
 </section>
@@ -70,14 +70,14 @@ a:focus-visible { outline: 3px solid #0DC59A; outline-offset: 2px; }
 </div>
 <div style="margin-top:64px;padding-top:32px;border-top:1px solid #DDE0E5;display:flex;gap:16px 32px;flex-wrap:wrap;align-items:center;font-size:15px">
 <span style="font-weight:600">From ₹12,000 per court per year. No commission on direct bookings.</span>
-<a href="#/pricing">Pricing</a><a href="#/platform">Platform</a><a href="#/city/surat">Surat</a><a href="#/city/vadodara">Vadodara</a><a href="#/city/bangalore">Bangalore</a>
+<a href="/pricing">Pricing</a><a href="/platform">Platform</a><a href="/city/surat">Surat</a><a href="/city/vadodara">Vadodara</a><a href="/city/bangalore">Bangalore</a>
 </div>
 </section>
 
 <section style="background:#E8FBF5">
 <div style="max-width:1200px;margin:0 auto;padding:88px 24px">
 <h2 style="font-family:Outfit,sans-serif;font-weight:800;font-size:clamp(32px,4.2vw,60px);line-height:0.98;letter-spacing:-0.035em;margin:0 0 24px;max-width:20ch;text-wrap:balance">{{ d.ctaH2 }}</h2>
-<a href="#/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a demo</a>
+<a href="/demo" style="background:#0DC59A;color:#061428;text-decoration:none;padding:18px 32px;font-weight:700;font-size:17px;display:inline-block">Book a demo</a>
 </div>
 </section>
 </div>

@@ -78,7 +78,7 @@
   function currentRoute() {
     var d = doc();
     if (!d) return 'home';
-    var raw = ((d.defaultView.location.hash || '#/home').replace(/^#\/?/, '').split('?')[0] || 'home');
+    var raw = ((d.defaultView.location.pathname || '/home').replace(/^\/?/, '').split('?')[0] || 'home');
     var first = raw.split('/')[0] || 'home';
     return ALIAS[first] || first;
   }
