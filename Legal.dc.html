@@ -270,10 +270,10 @@ a { color: #0D1B3E; } a:hover { color: #088064; }
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  componentDidMount() { this.jump(); this._h = () => this.jump(); window.addEventListener('hashchange', this._h); }
-  componentWillUnmount() { window.removeEventListener('hashchange', this._h); }
+  componentDidMount() { this.jump(); this._h = () => this.jump(); window.addEventListener('popstate', this._h); }
+  componentWillUnmount() { window.removeEventListener('popstate', this._h); }
   jump() {
-    const m = (window.location.hash || '').match(/[?&]a=([a-z]+)/);
+    const m = (window.location.search || '').match(/[?&]a=([a-z]+)/);
     if (!m) return;
     setTimeout(() => {
       const el = document.getElementById(m[1]);

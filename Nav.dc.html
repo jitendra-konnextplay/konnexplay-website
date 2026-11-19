@@ -75,14 +75,14 @@ class Component extends DCLogic {
     document.addEventListener('scroll', this._s, true);
     this._r(); this._s();
 
-    this._h = () => { const r = (window.location.hash || '').replace(/^#\/?/, '').split('?')[0]; this.setState({ home: r === '' || r === 'home' }); };
-    window.addEventListener('hashchange', this._h); this._h();
+    this._h = () => { const r = (window.location.pathname || '/').replace(/^\/|\/$/g, '').split('?')[0]; this.setState({ home: r === '' || r === 'home' }); };
+    window.addEventListener('popstate', this._h); this._h();
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this._r);
     window.removeEventListener('scroll', this._s, true);
     document.removeEventListener('scroll', this._s, true);
-    window.removeEventListener('hashchange', this._h);
+    window.removeEventListener('popstate', this._h);
   }
   renderVals() {
     const m = this.state.w < 1060;
