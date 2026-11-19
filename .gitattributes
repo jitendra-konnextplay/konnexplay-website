@@ -1,0 +1,5 @@
+# Minified vendor bundles are pinned by SRI hash in support.js. Letting git
+# normalize their line endings on checkout silently changes their bytes and
+# breaks that hash on any machine with core.autocrlf on, without changing
+# anything visible in the file. Treat them as opaque.
+assets/vendor/*.js -text
