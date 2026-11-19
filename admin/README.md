@@ -21,10 +21,21 @@ you press **Save and publish**.
 | Setup fee waived | Home and pricing |
 | Registered address | Legal pages |
 | Lead capture URL | Where demo requests are saved |
+| Scripts in `<head>` | Every page — verification tags, Google Tag Manager, Meta Pixel, and similar |
+| Scripts at the start of `<body>` | Every page — for things like GTM's `<noscript>` fallback |
+| Organization structured data (JSON-LD) | Every page |
+| Per-page title, description, URL slug, structured data | One page at a time: Home, Platform, Pricing, Book a demo, FAQ, About, Contact, Resources, Blog, Research report, Channel manager, India, Legal |
 
 Change the phone number once and it changes in every one of those places at
 the same time, including the `tel:` links and the WhatsApp message the demo
 form opens.
+
+A page's URL slug is an *extra* address it also answers to — for example
+giving Book a demo the slug `book-a-demo` makes `/book-a-demo` work
+alongside its usual `/demo`, and search engines are pointed at whichever one
+is set. The usual address never stops working, and sport, city and
+individual blog post pages aren't covered yet (each blog post already has
+its own title and excerpt in the Blog posts section above).
 
 ## What you cannot change here
 

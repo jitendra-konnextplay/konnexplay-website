@@ -224,6 +224,68 @@
       </label>
     </div>
 
+    <div class="group">
+      <h2>SEO</h2>
+      <label>
+        <span>Scripts in &lt;head&gt;</span>
+        <textarea id="seoHeadScripts" rows="4" placeholder="&lt;meta name=&quot;google-site-verification&quot; content=&quot;...&quot;&gt;"></textarea>
+        <small>Pasted as-is into every page's &lt;head&gt;. For a Google Search Console or Bing verification tag, a Google Tag Manager script, a Meta Pixel, and similar. This runs in every visitor's browser, so only paste snippets you trust.</small>
+      </label>
+      <label>
+        <span>Scripts at the start of &lt;body&gt;</span>
+        <textarea id="seoBodyScripts" rows="3" placeholder="&lt;noscript&gt;...&lt;/noscript&gt;"></textarea>
+        <small>For the handful of things that must be in the body, like Google Tag Manager's &lt;noscript&gt; fallback.</small>
+      </label>
+      <label>
+        <span>Organization structured data (JSON-LD)</span>
+        <textarea id="seoOrgJsonLd" rows="3" placeholder='{"@context":"https://schema.org","@type":"Organization","name":"KonnexPlay"}'></textarea>
+        <small>Just the JSON object, no &lt;script&gt; tag. Shown on every page. Leave blank for none.</small>
+        <em class="err" id="err-seoOrgJsonLd"></em>
+      </label>
+    </div>
+
+    <div class="group">
+      <h2>Per-page SEO</h2>
+      <label>
+        <span>Page</span>
+        <select id="seoPage" style="width:100%;padding:10px 12px;font:15px Inter,sans-serif;border:1.5px solid var(--line);border-radius:6px;background:#fff;min-height:44px;color:var(--ink)">
+          <option value="home">Home</option>
+          <option value="platform">Platform</option>
+          <option value="pricing">Pricing</option>
+          <option value="demo">Book a demo</option>
+          <option value="faq">FAQ</option>
+          <option value="about">About</option>
+          <option value="contact">Contact</option>
+          <option value="resources">Resources</option>
+          <option value="blog">Blog</option>
+          <option value="research">Research report</option>
+          <option value="channel-manager">Channel manager</option>
+          <option value="india">India</option>
+          <option value="legal">Legal</option>
+        </select>
+        <small>Sport, city and individual blog post pages aren't here yet; each blog post has its own title and excerpt below instead.</small>
+      </label>
+      <label>
+        <span>Title</span>
+        <input type="text" id="seoPageTitle" placeholder="Leave blank to use the default">
+      </label>
+      <label>
+        <span>Meta description</span>
+        <textarea id="seoPageDescription" rows="2" placeholder="Leave blank to use the default"></textarea>
+      </label>
+      <label>
+        <span>URL slug</span>
+        <input type="text" id="seoPageSlug" placeholder="e.g. book-a-demo">
+        <small>An extra address this page also answers to, and the one search engines are pointed at. The page's usual address keeps working too. Leave blank to use only the default.</small>
+        <em class="err" id="err-seoPageSlug"></em>
+      </label>
+      <label>
+        <span>Structured data (JSON-LD)</span>
+        <textarea id="seoPageJsonLd" rows="3" placeholder='{"@context":"https://schema.org","@type":"FAQPage", "mainEntity": [...]}'></textarea>
+        <small>Just the JSON object, no &lt;script&gt; tag. Shown on this page only.</small>
+        <em class="err" id="err-seoPageJsonLd"></em>
+      </label>
+    </div>
 
     <div class="group">
       <h2>Blog posts</h2>
@@ -368,6 +430,9 @@
     pro: ['pricing', 'pro'],
     setupWaived: ['pricing', 'setupWaived'],
     address: ['company', 'address'],
+    seoHeadScripts: ['seo', 'headScripts'],
+    seoBodyScripts: ['seo', 'bodyScripts'],
+    seoOrgJsonLd: ['seo', 'organizationJsonLd'],
     analyticsProvider: ['analytics', 'provider'],
     analyticsId: ['analytics', 'id'],
     zohoEnabled: ['zoho', 'enabled'],
@@ -383,6 +448,72 @@
   var sha = null;       // blob sha, needed to update without clobbering
   var token = '';
   var dirty = false;
+
+  /* ---------- per-page SEO ---------- */
+
+  // Must match the router's known route tokens in index.html (renderVals),
+  // plus the aliases it already recognises, so a custom slug can never mask
+  // a page the site itself answers to.
+  var SEO_PAGES = ['home', 'platform', 'pricing', 'demo', 'faq', 'about', 'contact', 'resources', 'blog', 'research', 'channel-manager', 'india', 'legal'];
+  var RESERVED_TOKENS = {};
+  ['home', 'platform', 'pricing', 'faq', 'contact', 'about', 'resources', 'research', 'india', 'channel-manager', 'demo', 'city', 'sport', 'legal', 'blog',
+   'book-a-demo', 'bookademo', 'book', 'book-demo', 'faqs', 'price', 'plans'].forEach(function (t) { RESERVED_TOKENS[t] = true; });
+
+  var seoPagesDraft = {};   // page -> {title, description, slug, jsonLd}, only non-empty entries kept
+  var currentSeoPage = 'home';
+
+  /** Whatever is in the four fields right now, folded into the draft for
+      whichever page is currently selected. Called before switching pages
+      and on every keystroke, so nothing typed is ever lost mid-edit. */
+  function flushSeoPageFields() {
+    var v = {
+      title: $('seoPageTitle').value.trim(),
+      description: $('seoPageDescription').value.trim(),
+      slug: $('seoPageSlug').value.trim(),
+      jsonLd: $('seoPageJsonLd').value.trim()
+    };
+    if (v.title || v.description || v.slug || v.jsonLd) seoPagesDraft[currentSeoPage] = v;
+    else delete seoPagesDraft[currentSeoPage];
+  }
+
+  function loadSeoPageFields(page) {
+    var v = seoPagesDraft[page] || {};
+    $('seoPageTitle').value = v.title || '';
+    $('seoPageDescription').value = v.description || '';
+    $('seoPageSlug').value = v.slug || '';
+    $('seoPageJsonLd').value = v.jsonLd || '';
+    ['seoPageSlug', 'seoPageJsonLd'].forEach(function (id) {
+      $(id).classList.remove('bad');
+      var err = $('err-' + id); if (err) { err.textContent = ''; err.className = 'err'; }
+    });
+  }
+
+  /** Format, and collision with a route the site itself already answers to
+      or with another page's slug in this same draft. */
+  function seoSlugProblem(slug, forPage) {
+    if (!slug) return '';
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) return 'Lowercase letters, numbers and hyphens only, no leading or trailing hyphen — for example book-a-demo.';
+    if (RESERVED_TOKENS[slug]) return 'That address already belongs to a page on the site. Choose a different one.';
+    var clash = Object.keys(seoPagesDraft).some(function (p) { return p !== forPage && seoPagesDraft[p].slug === slug; });
+    if (clash) return 'Another page already uses that address.';
+    return '';
+  }
+
+  function validateSeoPageFields() {
+    var ok = true;
+    var slug = $('seoPageSlug').value.trim();
+    var sErr = seoSlugProblem(slug, currentSeoPage);
+    $('seoPageSlug').classList.toggle('bad', !!sErr);
+    var se = $('err-seoPageSlug'); if (se) { se.textContent = sErr; se.className = sErr ? 'err show' : 'err'; }
+    if (sErr) ok = false;
+
+    var jErr = seoJsonProblem($('seoPageJsonLd').value.trim());
+    $('seoPageJsonLd').classList.toggle('bad', !!jErr);
+    var je = $('err-seoPageJsonLd'); if (je) { je.textContent = jErr; je.className = jErr ? 'err show' : 'err'; }
+    if (jErr) ok = false;
+
+    return ok;
+  }
 
   window.msg = msg;
   function msg(kind, text) {
@@ -406,6 +537,13 @@
     return '';
   }
 
+  /** Blank is fine (no structured data); anything else must parse as JSON. */
+  function seoJsonProblem(v) {
+    if (!v) return '';
+    try { JSON.parse(v); return ''; }
+    catch (e) { return 'That is not valid JSON. Paste just the object, for example {"@context":"https://schema.org", ...}, with no <script> tag around it.'; }
+  }
+
   var RULES = {
     phoneDisplay: function (v) {
       if (!v) return 'A phone number is required.';
@@ -424,6 +562,7 @@
       if (v && !/^https:\/\//.test(v)) return 'Must start with https://';
       return '';
     },
+    seoOrgJsonLd: function (v) { return seoJsonProblem(v); },
     starter: function (v) { return /^[\d,]+$/.test(v) ? '' : 'Numbers and commas only, for example 12,000'; },
     pro: function (v) { return /^[\d,]+$/.test(v) ? '' : 'Numbers and commas only, for example 18,000'; },
     setupWaived: function (v) { return /^[\d,]+$/.test(v) ? '' : 'Numbers and commas only, for example 5,000'; },
@@ -465,6 +604,7 @@
       // a screen reader to find long after the field was corrected.
       else { el.classList.remove('bad'); if (err) { err.textContent = ''; err.className = 'err'; } }
     });
+    if (!validateSeoPageFields()) ok = false;
     return ok;
   }
 
@@ -491,6 +631,8 @@
     // Digits are derived, never typed, so the two can never disagree.
     var d = kxPhoneDigits($('phoneDisplay').value);
     if (d) set(c, ['contact', 'phoneDigits'], d);
+    flushSeoPageFields();
+    set(c, ['seo', 'pages'], JSON.parse(JSON.stringify(seoPagesDraft)));
     return c;
   }
 
@@ -501,6 +643,10 @@
     });
     var ze = $('zohoEnabled');
     if (ze) ze.value = get(c, ['zoho', 'enabled']) === 'true' ? 'yes' : '';
+    seoPagesDraft = JSON.parse(JSON.stringify((c && c.seo && c.seo.pages) || {}));
+    currentSeoPage = 'home';
+    var sp = $('seoPage'); if (sp) sp.value = currentSeoPage;
+    loadSeoPageFields(currentSeoPage);
   }
 
   /* ---------- preview ---------- */
@@ -595,6 +741,9 @@
     pro: 'Pro, rupees per court per year',
     setupWaived: 'Setup fee waived, rupees',
     address: 'Registered address',
+    seoHeadScripts: 'Scripts in <head>',
+    seoBodyScripts: 'Scripts at the start of <body>',
+    seoOrgJsonLd: 'Organization structured data',
     analyticsProvider: 'Measurement service',
     analyticsId: 'Site identifier',
     zohoEnabled: 'Send demo requests to Zoho CRM',
@@ -636,6 +785,24 @@
     if (wasD !== nowD) {
       rows.push({ label: 'WhatsApp number the buttons dial', was: wasD, now: nowD, secret: false });
     }
+
+    // Per-page SEO lives in a nested object the generic FIELDS loop above
+    // cannot see, so it is diffed separately, one row per page that changed.
+    var wasPages = readPath(content || {}, ['seo', 'pages']) || {};
+    var nowPages = readPath(next, ['seo', 'pages']) || {};
+    var pageKeys = {};
+    Object.keys(wasPages).concat(Object.keys(nowPages)).forEach(function (k) { pageKeys[k] = true; });
+    Object.keys(pageKeys).forEach(function (p) {
+      var was = JSON.stringify(wasPages[p] || {});
+      var now = JSON.stringify(nowPages[p] || {});
+      if (was === now) return;
+      rows.push({
+        label: 'SEO: ' + p,
+        was: wasPages[p] ? 'customised' : '(default)',
+        now: nowPages[p] ? 'customised' : '(default)',
+        secret: false
+      });
+    });
 
     // And anything edited in the preview.
     try { if (window.KX_EXTRA_ROWS) rows = rows.concat(window.KX_EXTRA_ROWS()); } catch (e) {}
@@ -850,6 +1017,19 @@
     if (!el) return;
     el.addEventListener('input', markDirty);
     if (el.tagName === 'SELECT') el.addEventListener('change', function () { syncAnalyticsHelp(); markDirty(); });
+  });
+
+  $('seoPage').addEventListener('change', function () {
+    flushSeoPageFields();
+    currentSeoPage = this.value;
+    loadSeoPageFields(currentSeoPage);
+  });
+  ['seoPageTitle', 'seoPageDescription', 'seoPageSlug', 'seoPageJsonLd'].forEach(function (id) {
+    $(id).addEventListener('input', function () {
+      flushSeoPageFields();
+      validateSeoPageFields();
+      markDirty();
+    });
   });
 
   function syncAnalyticsHelp() {

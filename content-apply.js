@@ -139,6 +139,49 @@
     if (t.length || a.length) sweep(node, t, a);
   }
 
+  /* Raw HTML from content.json's SEO fields (verification meta tags, a GTM
+     snippet, a GTM noscript fallback, JSON-LD). <script> tags inserted via
+     innerHTML never run, so each child is walked and, if it is a <script>,
+     rebuilt as a real element. Nodes from the previous call are removed
+     first so editing a field in the admin preview replaces rather than
+     stacks them. */
+  var injectedHead = [];
+  var injectedBody = [];
+  function inject(html, container, prepend, tracker) {
+    tracker.forEach(function (n) { try { n.remove(); } catch (e) {} });
+    tracker.length = 0;
+    if (!html) return;
+    var tmp = document.createElement('template');
+    tmp.innerHTML = html;
+    var kids = Array.prototype.slice.call(tmp.content.childNodes);
+    if (prepend) kids.reverse();
+    kids.forEach(function (node) {
+      if (node.nodeType !== 1) return; // skip stray text/comments
+      var el;
+      if (node.tagName === 'SCRIPT') {
+        el = document.createElement('script');
+        for (var i = 0; i < node.attributes.length; i++) el.setAttribute(node.attributes[i].name, node.attributes[i].value);
+        el.text = node.textContent;
+      } else {
+        el = node.cloneNode(true);
+      }
+      if (prepend) container.insertBefore(el, container.firstChild);
+      else container.appendChild(el);
+      tracker.push(el);
+    });
+  }
+  var orgJsonLdEl = null;
+  function applyOrgJsonLd(json) {
+    if (!json) { if (orgJsonLdEl) { orgJsonLdEl.remove(); orgJsonLdEl = null; } return; }
+    if (!orgJsonLdEl) {
+      orgJsonLdEl = document.createElement('script');
+      orgJsonLdEl.type = 'application/ld+json';
+      orgJsonLdEl.id = 'kx-org-jsonld';
+      document.head.appendChild(orgJsonLdEl);
+    }
+    orgJsonLdEl.textContent = json;
+  }
+
   function applyConfig(c) {
     /* An empty string is still a string. Testing the type alone meant a blank
        endpoint in content.json wiped whatever config.js had set, on every page
@@ -148,6 +191,10 @@
       window.KX_LEAD_ENDPOINT = c.leads.endpoint;
     }
     if (c && c.zoho) { window.KX_ZOHO = c.zoho; }
+    window.KX_SEO = (c && c.seo) || {};
+    inject(window.KX_SEO.headScripts || '', document.head, false, injectedHead);
+    inject(window.KX_SEO.bodyScripts || '', document.body, true, injectedBody);
+    applyOrgJsonLd(window.KX_SEO.organizationJsonLd || '');
     if (c && c.analytics && c.analytics.provider && c.analytics.id) {
       window.KX_ANALYTICS = c.analytics;
       if (!document.getElementById('kx-analytics')) {
@@ -192,10 +239,20 @@
   window.addEventListener('message', function (e) {
     if (!e.data || e.data.type !== 'kx-preview-content') return;
     try { applyConfig(e.data.content); } catch (err) {}
+    // Per-page title/description/slug/JSON-LD only get (re)computed when the
+    // router recomputes its SEO tags. A real route change already does
+    // that; this asks for the same recompute without navigating anywhere,
+    // so editing one of those fields shows up without touching scroll
+    // position (popstate would reset it, which a route change should but a
+    // field edit should not).
+    try { window.dispatchEvent(new Event('kx-seo-refresh')); } catch (err) {}
   });
 
-  fetch('content.json', { cache: 'no-store' })
+  // The router (index.html) waits briefly on this before its first render,
+  // so a URL naming a page by its admin-configured slug resolves correctly
+  // from the start rather than needing a second pass once this lands.
+  window.KX_SEO_READY = fetch('content.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (c) { if (c) applyConfig(c); })
-    .catch(function () {});
+    .then(function (c) { if (c) applyConfig(c); return c; })
+    .catch(function () { return null; });
 })();

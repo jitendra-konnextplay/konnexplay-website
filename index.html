@@ -8,17 +8,17 @@
 <link rel="apple-touch-icon" href="assets/konnexplay-mark-1024.png">
 <meta name="theme-color" content="#0D1B3E">
 <link rel="manifest" href="site.webmanifest">
-<script src="./config.js?v=9e31004d"></script>
+<script src="./config.js?v=ead4ef68"></script>
 <script src="./cache.js?v=354445de"></script>
 <script src="./support.js"></script>
 <script src="./perf.js?v=38a546aa"></script>
-<script src="./content-apply.js?v=df8333b2"></script>
-<link rel="stylesheet" href="./polish.css?v=ccd60582">
-<script src="./actionbar.js?v=fb31dfbf"></script>
+<script src="./content-apply.js?v=334e8766"></script>
+<link rel="stylesheet" href="./polish.css?v=a7aff541">
+<script src="./actionbar.js?v=d68d9763"></script>
 <script src="./zoho.js?v=1feb29cc"></script>
 <script src="./leads.js?v=51c87e8c"></script>
 <script src="./update-check.js?v=2277d7fc"></script>
-<script src="./anchors.js?v=52cf05b9"></script>
+<script src="./anchors.js?v=0d5e98b9"></script>
 <script src="./sw-register.js?v=a0eca5f0"></script>
 <script src="./lightbox.js?v=49f46d45"></script>
 <script src="./shots.js?v=5a142313"></script>
@@ -222,6 +222,10 @@ class Component extends DCLogic {
   componentDidMount() {
     this._pop = () => this.parse();
     window.addEventListener('popstate', this._pop);
+    /* The admin preview recomputes SEO tags this way, without navigating
+       anywhere, when a per-page SEO field changes. */
+    this._seoRefresh = () => { try { this.renderVals(); } catch (e) {} };
+    window.addEventListener('kx-seo-refresh', this._seoRefresh);
     this._click = (e) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
@@ -236,11 +240,21 @@ class Component extends DCLogic {
     };
     document.addEventListener('click', this._click);
 
-    this.parse();
+    /* A URL can name a page by its admin-configured slug instead of its
+       default token (see renderVals). That slug lives in content.json,
+       fetched asynchronously by content-apply.js, so the very first parse
+       waits for it (briefly, and only once) rather than rendering the wrong
+       page and never correcting itself. */
+    let started = false;
+    const start = () => { if (started) return; started = true; this.parse(); };
+    const ready = window.KX_SEO_READY;
+    if (ready && typeof ready.then === 'function') { ready.then(start, start); setTimeout(start, 800); }
+    else start();
     [120, 600, 1400].forEach(t => setTimeout(() => this.reveal(), t));
   }
   componentWillUnmount() {
     window.removeEventListener('popstate', this._pop);
+    window.removeEventListener('kx-seo-refresh', this._seoRefresh);
     document.removeEventListener('click', this._click);
     if (this._io) this._io.disconnect();
   }
@@ -281,6 +295,16 @@ class Component extends DCLogic {
       const m = map[route] || map.home;
       t = m[0]; d = m[1]; p = m[2];
     }
+    /* Admin-entered overrides, when set, replace the defaults above for this
+       one page. An empty field means "use the default", not "use nothing".
+       The blog override is for the listing only: an individual post (route
+       'blog' with an arg) has its own title and excerpt from blog-posts.json. */
+    const ov = !(route === 'blog' && arg) && window.KX_SEO && window.KX_SEO.pages && window.KX_SEO.pages[route];
+    if (ov) {
+      if (ov.title) t = ov.title;
+      if (ov.description) d = ov.description;
+      if (ov.slug) p = ov.slug;
+    }
     document.title = t + B;
     const set = (sel, attr, val) => {
       let el = document.head.querySelector(sel);
@@ -300,6 +324,21 @@ class Component extends DCLogic {
     set('meta[name="twitter:card"]', 'content', 'summary_large_image');
     set('meta[name="twitter:title"]', 'content', t + B);
     set('meta[name="twitter:description"]', 'content', d);
+    this.setJsonLd(ov && ov.jsonLd || '');
+  }
+  /* The one per-page structured-data block, admin-entered as a bare JSON
+     object (no <script> tag). Swapped out, not stacked, on every route
+     change; removed entirely when the page has none. */
+  setJsonLd(json) {
+    let el = document.getElementById('kx-page-jsonld');
+    if (!json) { if (el) el.remove(); return; }
+    if (!el) {
+      el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = 'kx-page-jsonld';
+      document.head.appendChild(el);
+    }
+    el.textContent = json;
   }
   renderVals() {
     const r = this.state.route;
@@ -307,6 +346,13 @@ class Component extends DCLogic {
     const sportMap = { 'box-cricket': 'Box cricket', 'football-turf': 'Football turf', pickleball: 'Pickleball', padel: 'Padel', badminton: 'Badminton', tennis: 'Tennis' };
     const known = ['home','platform','pricing','faq','contact','about','resources','research','india','channel-manager','demo','city','sport','legal','blog'];
     const ALIAS = { 'book-a-demo': 'demo', 'bookademo': 'demo', 'book': 'demo', 'book-demo': 'demo', 'faqs': 'faq', 'price': 'pricing', 'plans': 'pricing', 'blog': 'blog' };
+    /* A page's admin-configured slug (content.json) is an extra address it
+       also answers to, on top of its default token. */
+    const seoPages = (window.KX_SEO && window.KX_SEO.pages) || {};
+    Object.keys(seoPages).forEach(key => {
+      const slug = seoPages[key] && seoPages[key].slug;
+      if (slug && !ALIAS[slug]) ALIAS[slug] = key;
+    });
     const rAlias = ALIAS[r] || r;
     const route = known.includes(rAlias) ? rAlias : 'home';
     const cityName = cityMap[this.state.arg] || 'Surat';

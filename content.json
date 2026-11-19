@@ -34,5 +34,11 @@
     "actionType": "TGVhZHM=",
     "leadSource": "Website",
     "leadStatus": "Not Contacted"
+  },
+  "seo": {
+    "headScripts": "",
+    "bodyScripts": "",
+    "organizationJsonLd": "",
+    "pages": {}
   }
 }
